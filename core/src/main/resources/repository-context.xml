@@ -10,6 +10,6 @@
 
     <import resource="infrastructure.xml"/>
 
-    <jpa:repositories  base-package="org.tnt.scp.data.services" factory-class="org.tnt.scp.data.repository.RepositoryFactory"/>
+    <jpa:repositories  base-package="org.tnt.scp.services" factory-class="org.springframework.data.jpa.repository.support.JpaRepositoryFactoryBean"/>
 
 </beans>

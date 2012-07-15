@@ -11,16 +11,16 @@
 		<property name="jpaVendorAdapter">
 			<bean class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter">
 				<property name="generateDdl" value="true" />
-				<property name="database" value="HSQL" />
+				<property name="database" value="H2" />
 			</bean>
 		</property>
-		<property name="persistenceUnitName" value="jpa.sample" />
+		<!--<property name="persistenceUnitName" value="scp.jpa" />-->
 	</bean>
 	
 	<bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
 		<property name="entityManagerFactory" ref="entityManagerFactory" />
 	</bean>
 	
-	<jdbc:embedded-database id="dataSource" type="HSQL" />
+	<jdbc:embedded-database id="dataSource" type="H2" />
 
 </beans>
