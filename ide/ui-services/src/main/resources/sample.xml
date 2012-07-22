@@ -1,0 +1,18 @@
+<script>
+  <id>string</id>
+  <author>string</author>
+  <characters>
+    <!--Zero or more repetitions:-->
+    <character>
+      <name>string</name>
+      <description>string</description>
+    </character>
+  </characters>
+  <scenes>
+    <!--Zero or more repetitions:-->
+    <scene>
+      <name>string</name>
+      <ref-id>string</ref-id>
+    </scene>
+  </scenes>
+</script>

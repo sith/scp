@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
-    <artifactId>scp-application</artifactId>
-    <groupId>org.tnt.scp</groupId>
-    <version>1.0</version>
-  </parent>
+        <artifactId>scp-application</artifactId>
+        <groupId>org.tnt.scp</groupId>
+        <version>1.0</version>
+    </parent>
 
     <groupId>org.tnt.scp</groupId>
     <artifactId>ide-parent</artifactId>
@@ -38,7 +39,7 @@
                     <configuration>
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
-                        <useOSGiDependencies>true</useOSGiDependencies>
+                        <useOSGiDependencies>false</useOSGiDependencies>
                     </configuration>
                 </plugin>
                 <plugin>
@@ -51,11 +52,11 @@
                         <target>1.6</target>
                     </configuration>
                 </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-jar-plugin</artifactId>
-                <version>2.3.1</version>
-            </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.1</version>
+                </plugin>
             </plugins>
         </pluginManagement>
     </build>
@@ -63,11 +64,10 @@
     <modules>
         <module>branding</module>
         <module>application</module>
-    <module>ui-main</module>
-  </modules>
+        <module>ui-services</module>
+        <module>ui-main</module>
+        <module>script-editor</module>
+    </modules>
 
-    <properties>
-        <netbeans.version>RELEASE712</netbeans.version>
-        <brandingToken>ide</brandingToken>
-    </properties>
+
 </project>

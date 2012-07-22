@@ -11,6 +11,13 @@
         <module>core</module>
         <module>ide</module>
     </modules>
+
+    <properties>
+        <netbeans.version>RELEASE72</netbeans.version>
+        <brandingToken>ide</brandingToken>
+    </properties>
+
+
     <build>
         <plugins>
             <plugin>
@@ -24,4 +31,5 @@
             </plugin>
         </plugins>
     </build>
+
 </project>

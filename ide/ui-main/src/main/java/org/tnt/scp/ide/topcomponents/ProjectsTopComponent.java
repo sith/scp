@@ -4,11 +4,22 @@
  */
 package org.tnt.scp.ide.topcomponents;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.swing.Action;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.explorer.ExplorerManager;
+import org.openide.explorer.ExplorerUtils;
+import org.openide.explorer.view.BeanTreeView;
+import org.openide.loaders.DataLoader;
+import org.openide.loaders.MultiFileLoader;
+import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.lookup.Lookups;
 
 /**
  * Top component which displays something.
@@ -31,6 +42,7 @@ preferredID = "ProjectsTopComponent")
     "HINT_ProjectsTopComponent=This is a Projects window"
 })
 public final class ProjectsTopComponent extends TopComponent {
+    private final ExplorerManager manager = new ExplorerManager();
 
     public ProjectsTopComponent() {
         initComponents();
@@ -41,7 +53,12 @@ public final class ProjectsTopComponent extends TopComponent {
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_SLIDING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
-
+        
+        initTree();
+initActions();
+associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
+        
+        
     }
 
     /**
@@ -52,19 +69,23 @@ public final class ProjectsTopComponent extends TopComponent {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        projectsPane = new BeanTreeView();
+        ;
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+            .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+            .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JScrollPane projectsPane;
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
@@ -87,4 +108,14 @@ public final class ProjectsTopComponent extends TopComponent {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
     }
+
+    private void initTree() {
+        
+    }
+
+    private void initActions() {
+        
+    }
+
+   
 }

@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+OpenIDE-Module-Layer: org/tnt/scp/scripteditor/layer.xml
+OpenIDE-Module-Localizing-Bundle: org/tnt/scp/scripteditor/Bundle.properties
