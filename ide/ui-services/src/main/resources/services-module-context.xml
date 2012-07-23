@@ -9,5 +9,6 @@
         <property name="schema" value="classpath:script.xsd"/>
     </bean>
 
+    <bean id="contextHandler" class="org.tnt.scp.uiservices.installer.ContextHandler"/>
 
 </beans>

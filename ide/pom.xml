@@ -40,7 +40,9 @@
                         <brandingToken>${brandingToken}</brandingToken>
                         <cluster>${brandingToken}</cluster>
                         <useOSGiDependencies>false</useOSGiDependencies>
+                        <additionalArguments>-J-Xmx256m -J-Xnoagent -J-Djava.compiler=NONE -J-Xdebug -J-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=5005</additionalArguments>
                     </configuration>
+
                 </plugin>
                 <plugin>
                     <!-- NetBeans 6.9+ requires JDK 6 -->

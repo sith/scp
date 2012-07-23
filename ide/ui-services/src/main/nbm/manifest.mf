@@ -1,2 +1,4 @@
 Manifest-Version: 1.0
+OpenIDE-Module-Install: org/tnt/scp/uiservices/installer/Installer.class
+OpenIDE-Module-Layer: org/tnt/scp/uiservices/layer.xml
 OpenIDE-Module-Localizing-Bundle: org/tnt/scp/uiservices/Bundle.properties

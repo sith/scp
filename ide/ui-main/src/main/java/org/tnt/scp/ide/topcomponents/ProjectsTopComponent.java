@@ -4,45 +4,51 @@
  */
 package org.tnt.scp.ide.topcomponents;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.swing.Action;
+import com.google.common.collect.Lists;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
-import org.openide.loaders.DataLoader;
-import org.openide.loaders.MultiFileLoader;
+import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.openide.util.lookup.Lookups;
+import org.tnt.scp.common.generated.ScriptType;
+import org.tnt.scp.ide.nodes.ChildrenMap;
+import org.tnt.scp.ide.nodes.RootNode;
+import org.tnt.scp.ide.nodes.ScriptNode;
+import org.tnt.scp.uiservices.events.AddScriptEvent;
+import org.tnt.scp.uiservices.service.ScriptService;
+
+import java.util.*;
 
 /**
  * Top component which displays something.
  */
 @ConvertAsProperties(dtd = "-//org.tnt.scp.ide.topcomponents//Projects//EN",
-autostore = false)
+        autostore = false)
 @TopComponent.Description(preferredID = "ProjectsTopComponent",
-iconBase = "org/tnt/scp/ide/topcomponents/folder-green.png",
-persistenceType = TopComponent.PERSISTENCE_ALWAYS)
+        iconBase = "org/tnt/scp/ide/topcomponents/folder-green.png",
+        persistenceType = TopComponent.PERSISTENCE_ALWAYS)
 @TopComponent.Registration(mode = "explorer", openAtStartup = true)
 @ActionID(category = "Window", id = "org.tnt.scp.ide.topcomponents.ProjectsTopComponent")
 @ActionReference(path = "Menu/Window" /*
  * , position = 333
  */)
 @TopComponent.OpenActionRegistration(displayName = "#CTL_ProjectsAction",
-preferredID = "ProjectsTopComponent")
+        preferredID = "ProjectsTopComponent")
 @Messages({
-    "CTL_ProjectsAction=Projects",
-    "CTL_ProjectsTopComponent=Projects Window",
-    "HINT_ProjectsTopComponent=This is a Projects window"
+        "CTL_ProjectsAction=Projects",
+        "CTL_ProjectsTopComponent=Projects Window",
+        "HINT_ProjectsTopComponent=This is a Projects window"
 })
-public final class ProjectsTopComponent extends TopComponent {
+public final class ProjectsTopComponent extends TopComponent implements ExplorerManager.Provider {
     private final ExplorerManager manager = new ExplorerManager();
+    private final Lookup.Result<AddScriptEvent> scriptTypeResult;
 
     public ProjectsTopComponent() {
         initComponents();
@@ -53,12 +59,31 @@ public final class ProjectsTopComponent extends TopComponent {
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_SLIDING_DISABLED, Boolean.TRUE);
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
-        
+
+
+
+        scriptTypeResult = Lookup.getDefault().lookup(ScriptService.class).getLookup().lookupResult(AddScriptEvent.class);
+        scriptTypeResult.addLookupListener(new LookupListener() {
+            @Override
+            public void resultChanged(LookupEvent ev) {
+
+                ScriptNode newScriptNode = new ScriptNode(scriptTypeResult.allInstances().iterator().next().getTarget());
+
+
+                List<Node> nodes = Lists.asList(newScriptNode, manager.getRootContext().getChildren().getNodes());
+                manager.getRootContext().getChildren().add(nodes.toArray(new Node[nodes.size()]));
+
+
+            }
+        });
+
+
         initTree();
-initActions();
-associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
-        
-        
+        initActions();
+        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
+
+
+
     }
 
     /**
@@ -75,17 +100,18 @@ associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 400, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
+                layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(projectsPane, javax.swing.GroupLayout.DEFAULT_SIZE, 300, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JScrollPane projectsPane;
+
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
@@ -110,12 +136,27 @@ associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
     }
 
     private void initTree() {
-        
+
+      
+        /*Node[] nodes = new Node[scriptTypes.size()];
+        for (ScriptType scriptType : scriptTypes) {
+            childrenMap.add(scriptType.getId(), new ScriptNode(scriptType));
+        }*/
+
+        ChildrenMap childrenMap = new ChildrenMap();
+        RootNode value = new RootNode(childrenMap);
+        manager.setRootContext(value);
+          List<ScriptType> scriptTypes = Lookup.getDefault().lookup(ScriptService.class).loadScripts();
     }
 
     private void initActions() {
-        
+
     }
 
-   
+
+    @Override
+    public ExplorerManager getExplorerManager() {
+        return manager;
+    }
+
 }

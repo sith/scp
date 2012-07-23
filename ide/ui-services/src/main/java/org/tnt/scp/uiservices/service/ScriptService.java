@@ -13,4 +13,5 @@ public interface ScriptService extends Lookup.Provider{
 
     public void removeScript(ScriptType script);
 
+    void createScript(String scriptName);
 }

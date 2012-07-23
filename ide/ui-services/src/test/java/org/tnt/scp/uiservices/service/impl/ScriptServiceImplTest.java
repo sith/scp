@@ -26,7 +26,7 @@ public class ScriptServiceImplTest {
         UUID uuid = UUID.randomUUID();
         System.out.println(uuid.toString());
 
-        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:jaxb-context.xml");
+        ClassPathXmlApplicationContext context = new ClassPathXmlApplicationContext("classpath:services-module-context.xml");
 
         Jaxb2Marshaller marshaller = context.getBean("jaxb2Marshaller", Jaxb2Marshaller.class);
 

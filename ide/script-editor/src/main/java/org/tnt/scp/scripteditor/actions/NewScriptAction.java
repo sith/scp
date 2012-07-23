@@ -10,6 +10,8 @@ import java.beans.PropertyChangeListener;
 import java.util.Collection;
 import javax.swing.*;
 
+import org.openide.DialogDisplayer;
+import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionRegistration;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
@@ -19,20 +21,21 @@ import org.openide.util.Lookup;
 
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.lookup.Lookups;
+import org.tnt.scp.uiservices.service.ScriptService;
 
 @ActionID(category = "Scripts/Editor",
-id = "org.tnt.scp.scripteditor.NewScriptAction")
+        id = "org.tnt.scp.scripteditor.NewScriptAction")
 @ActionRegistration(iconBase = "org/tnt/scp/scripteditor/new_script.png",
-displayName = "#CTL_NewScript")
+        displayName = "#CTL_NewScript")
 @ActionReferences({
-    @ActionReference(path = "Menu/File", position = 1300),
-    @ActionReference(path = "Toolbars/ScriptsEditor", position = 3333),
-    @ActionReference(path = "Shortcuts", name = "DO-N")
+        @ActionReference(path = "Menu/File", position = 1300),
+        @ActionReference(path = "Toolbars/ScriptsEditor", position = 3333),
+        @ActionReference(path = "Shortcuts", name = "DO-N")
 })
 @Messages("CTL_NewScript=New Script")
 public final class NewScriptAction extends AbstractAction {
 
-//
+    //
 //    public void actionPerformed(ActionEvent e) {
 //        // TODO implement action body
 //        Lookup lookup = Lookups.forPath("Action/Scripts/Editor");
@@ -46,12 +49,16 @@ public final class NewScriptAction extends AbstractAction {
     @Override
     public void actionPerformed(ActionEvent e) {
 
+        ScriptService scriptService = Lookup.getDefault().lookup(ScriptService.class);
 
-        Lookup lookup = Lookups.forPath("Actions/Scripts/Editor");
+        NotifyDescriptor.InputLine dialog = new NotifyDescriptor.InputLine(
+                "New Script",
+                "Please enter script name");
 
-        Collection<? extends Action> lookupAll = lookup.lookupAll(Action.class);
-        for (Action action : lookupAll) {
-            System.out.println(action);
-        }
+        DialogDisplayer.getDefault().notify(dialog);
+
+        scriptService.createScript(dialog.getInputText());
+
+
     }
 }
