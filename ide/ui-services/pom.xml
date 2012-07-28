@@ -178,6 +178,7 @@
                     </execution>
                 </executions>
                 <configuration>
+                    <schemaDirectory>src/main/resources/org/tnt/scp/uiservices/xsd</schemaDirectory>
                     <generatePackage>org.tnt.scp.common.generated</generatePackage>
                     <args>
                         <arg>-XtoString</arg>

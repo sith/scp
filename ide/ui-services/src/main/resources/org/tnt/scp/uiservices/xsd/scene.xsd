@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://scp/schema/scripts/scene"
+            xmlns:tns="http://scp/schema/scripts/scene"
+            elementFormDefault="qualified" xmlns:common="http://scp/schema/scripts/common">
+
+    <xsd:import schemaLocation="common.xsd" namespace="http://scp/schema/scripts/common"/>
+   
+    <xsd:complexType name="scene">
+        <xsd:sequence>
+            <xsd:element name="id" type="common:id"></xsd:element>
+            <xsd:element name="characters" type="common:charactersRef"></xsd:element>
+            <xsd:element name="header" type="tns:header"></xsd:element>
+            <xsd:element name="actions" type="tns:actions"></xsd:element>
+            <xsd:element name="scriptRef" type="common:id"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="scene" type="tns:scene"></xsd:element>
+    <xsd:complexType name="header">
+        <xsd:sequence>
+            <xsd:element name="intro" type="xsd:string"></xsd:element>
+            <xsd:element name="location" type="xsd:string"></xsd:element>
+            <xsd:element name="timeDescription" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="actions">
+        <xsd:sequence>
+            <xsd:element name="actions" type="tns:action" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="action">
+        <xsd:sequence>
+            <xsd:element name="characterRef" type="common:characterRef"></xsd:element>
+            <xsd:element name="description" type="xsd:string"></xsd:element>
+            <xsd:element name="note" type="xsd:string"></xsd:element>
+            <xsd:element name="dialog" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

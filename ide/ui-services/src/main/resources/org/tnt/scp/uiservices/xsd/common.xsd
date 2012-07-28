@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://scp/schema/scripts/common"
+            xmlns:tns="http://scp/schema/scripts/common"
+            elementFormDefault="qualified">
+    <xsd:complexType name="author">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:Name"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="id">
+        <xsd:sequence>
+            <xsd:element name="value" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="characters">
+        <xsd:sequence>
+            <xsd:element name="characters" type="tns:characterType" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="characterType">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"></xsd:element>
+            <xsd:element name="description" type="xsd:string" minOccurs="0"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="scenesRef">
+        <xsd:sequence>
+            <xsd:element name="scenesRef" type="tns:sceneRef" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="sceneRef">
+        <xsd:sequence>
+            <xsd:element name="name" type="xsd:string"></xsd:element>
+            <xsd:element name="sceneRef" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="charactersRef">
+        <xsd:sequence>
+            <xsd:element name="characterRefs" type="tns:characterRef" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="characterRef">
+        <xsd:sequence>
+            <xsd:element name="refId" type="tns:id" maxOccurs="1"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="index">
+        <xsd:sequence>
+            <xsd:element name="value" type="xsd:integer"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>

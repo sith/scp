@@ -17,12 +17,15 @@ import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.tnt.scp.common.generated.ScriptType;
+import org.tnt.scp.common.generated.Script;
 import org.tnt.scp.ide.nodes.ChildrenMap;
 import org.tnt.scp.ide.nodes.RootNode;
 import org.tnt.scp.ide.nodes.ScriptNode;
+import org.tnt.scp.uiservices.events.AbstractEvent;
 import org.tnt.scp.uiservices.events.AddScriptEvent;
+import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.ScriptService;
+import org.tnt.scp.uiservices.service.SystemEventListener;
 
 import java.util.*;
 
@@ -48,7 +51,6 @@ import java.util.*;
 })
 public final class ProjectsTopComponent extends TopComponent implements ExplorerManager.Provider {
     private final ExplorerManager manager = new ExplorerManager();
-    private final Lookup.Result<AddScriptEvent> scriptTypeResult;
 
     public ProjectsTopComponent() {
         initComponents();
@@ -61,8 +63,16 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
 
-
-        scriptTypeResult = Lookup.getDefault().lookup(ScriptService.class).getLookup().lookupResult(AddScriptEvent.class);
+        EventSystemService.SubscriberService subscriberService = Lookup.getDefault().lookup(EventSystemService.SubscriberService.class);
+        subscriberService.subscribeAddScriptEvent(new SystemEventListener<AddScriptEvent>() {
+            @Override
+            public void onEvent(AddScriptEvent event) {
+                ScriptNode scriptNode = new ScriptNode(event.getTarget());
+                List<Node> nodes = Lists.asList(scriptNode, manager.getRootContext().getChildren().getNodes());
+                manager.getRootContext().getChildren().add(nodes.toArray(new Node[nodes.size()]));
+            }
+        });
+        /*scriptTypeResult = Lookup.getDefault().lookup(ScriptService.class).getLookup().lookupResult(AddScriptEvent.class);
         scriptTypeResult.addLookupListener(new LookupListener() {
             @Override
             public void resultChanged(LookupEvent ev) {
@@ -76,7 +86,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
             }
         });
-
+*/
 
         initTree();
         initActions();
@@ -139,14 +149,14 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
       
         /*Node[] nodes = new Node[scriptTypes.size()];
-        for (ScriptType scriptType : scriptTypes) {
+        for (Script scriptType : scriptTypes) {
             childrenMap.add(scriptType.getId(), new ScriptNode(scriptType));
         }*/
 
         ChildrenMap childrenMap = new ChildrenMap();
         RootNode value = new RootNode(childrenMap);
         manager.setRootContext(value);
-          List<ScriptType> scriptTypes = Lookup.getDefault().lookup(ScriptService.class).loadScripts();
+          List<Script> scriptTypes = Lookup.getDefault().lookup(ScriptService.class).loadScripts();
     }
 
     private void initActions() {

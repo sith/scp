@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="http://scp/schema/scripts/script"
+    xmlns:tns="http://scp/schema/scripts/script"
+    elementFormDefault="qualified" xmlns:common="http://scp/schema/scripts/common">
+    <xsd:import schemaLocation="common.xsd" namespace="http://scp/schema/scripts/common"/>
+    <xsd:complexType name="script">
+        <xsd:sequence>
+            <xsd:element name="author" type="common:author"></xsd:element>
+            <xsd:element name="id" type="common:id"></xsd:element>
+            <xsd:element name="characters" type="common:characters"></xsd:element>
+            <xsd:element name="scenesRef" type="common:scenesRef"></xsd:element>
+            <xsd:element name="name" type="xsd:string"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:element name="script" type="tns:script"></xsd:element>
+</xsd:schema>

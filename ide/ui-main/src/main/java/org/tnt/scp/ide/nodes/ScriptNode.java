@@ -9,7 +9,7 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.tnt.scp.common.generated.SceneType;
-import org.tnt.scp.common.generated.ScriptType;
+import org.tnt.scp.common.generated.Script;
 
 import java.util.ArrayList;
 
@@ -18,9 +18,9 @@ import java.util.ArrayList;
  */
 public class ScriptNode extends AbstractNode {
 
-    private final ScriptType script;
+    private final Script script;
 
-    public ScriptNode(ScriptType script) {
+    public ScriptNode(Script script) {
         super(new Children.Array());
         this.script = script;
         setIconBaseWithExtension("org/tnt/scp/ide/types/script_type.png");
@@ -45,7 +45,7 @@ public class ScriptNode extends AbstractNode {
 //    }
 
 
-    public ScriptType getScript() {
+    public Script getScript() {
         return script;
     }
 }
