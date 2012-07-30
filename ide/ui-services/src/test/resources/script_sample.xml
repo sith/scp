@@ -1,0 +1,25 @@
+<scr:script xmlns:scr="http://scp/schema/scripts/script" xmlns:com="http://scp/schema/scripts/common">
+  <scr:author>
+    <com:name>string</com:name>
+  </scr:author>
+  <scr:id>
+    <com:value>string</com:value>
+  </scr:id>
+  <scr:characters>
+    <!--Zero or more repetitions:-->
+    <com:characters>
+      <com:name>string</com:name>
+      <!--Optional:-->
+      <com:description>string</com:description>
+    </com:characters>
+  </scr:characters>
+  <scr:scenesRef>
+    <!--Zero or more repetitions:-->
+    <com:scenesRef>
+      <com:scenRef>
+        <com:value>string</com:value>
+      </com:scenRef>
+    </com:scenesRef>
+  </scr:scenesRef>
+  <scr:name>string</scr:name>
+</scr:script>

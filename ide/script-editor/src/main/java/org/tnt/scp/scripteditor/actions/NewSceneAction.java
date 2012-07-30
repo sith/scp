@@ -22,6 +22,7 @@ import org.openide.util.NbBundle.Messages;
 import org.tnt.scp.common.generated.Script;
 import org.tnt.scp.scripteditor.panels.AddScenePanel;
 import org.tnt.scp.uiservices.service.EntryStatisticsService;
+import org.tnt.scp.uiservices.service.ScriptService;
 
 @ActionID(category = "Scripts/Editor",
         id = "org.tnt.scp.scripteditor.actions.NewSceneAction")
@@ -61,9 +62,8 @@ public final class NewSceneAction extends AbstractAction {
         Object notify = DialogDisplayer.getDefault().notify(d);
 
         if (notify == NotifyDescriptor.OK_OPTION) {
-
-            System.out.println("Create script " + panel.getSceneName() + " " + panel.getSelectedScript());
-
+            ScriptService scriptService = Lookup.getDefault().lookup(ScriptService.class);
+            scriptService.createScene(panel.getSelectedScript(), panel.getSceneName());
         }
 
 

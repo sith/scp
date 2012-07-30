@@ -27,13 +27,12 @@
     </xsd:complexType>
     <xsd:complexType name="scenesRef">
         <xsd:sequence>
-            <xsd:element name="scenesRef" type="tns:sceneRef" maxOccurs="unbounded"></xsd:element>
+            <xsd:element name="scenesRef" type="tns:sceneRef" maxOccurs="unbounded" minOccurs="0"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="sceneRef">
         <xsd:sequence>
-            <xsd:element name="name" type="xsd:string"></xsd:element>
-            <xsd:element name="sceneRef" type="xsd:string"></xsd:element>
+            <xsd:element name="scenRef" type="tns:id"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="charactersRef">

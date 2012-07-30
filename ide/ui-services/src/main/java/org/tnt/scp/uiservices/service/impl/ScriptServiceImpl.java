@@ -1,7 +1,8 @@
 package org.tnt.scp.uiservices.service.impl;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import org.apache.commons.io.IOUtils;
+import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Lookup;
@@ -10,6 +11,7 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.tnt.scp.common.generated.*;
+import org.tnt.scp.uiservices.events.AddSceneEvent;
 import org.tnt.scp.uiservices.events.AddScriptEvent;
 import org.tnt.scp.uiservices.installer.ContextHandler;
 import org.tnt.scp.uiservices.service.EntryStatisticsService;
@@ -24,7 +26,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
@@ -33,22 +34,24 @@ import java.util.UUID;
 public class ScriptServiceImpl implements ScriptService {
 
     private static final String SCRIPT_EXT = ".script";
+    public static final String SCENE_EXT = ".scene";
     private InstanceContent content = new InstanceContent();
     private final AbstractLookup abstractLookup;
     private ObjectFactory objectFactory;
     private final EntryStatisticsService.UpdateService scriptsStatistics;
     private final EventSystemService.ProducerService eventProducerService;
+    private Jaxb2Marshaller marshaller;
 
     public ScriptServiceImpl() {
         abstractLookup = new AbstractLookup(content);
         objectFactory = new ObjectFactory();
         scriptsStatistics = Lookup.getDefault().lookup(EntryStatisticsService.UpdateService.class);
         eventProducerService = Lookup.getDefault().lookup(EventSystemService.ProducerService.class);
+        marshaller = ContextHandler.getContext().getBean(Jaxb2Marshaller.class);
     }
 
     @Override
     public List<Script> loadScripts() {
-
 
         FileObject scriptsFolder = FileUtil.getConfigFile("Scripts");
         FileObject[] children = scriptsFolder.getChildren();
@@ -111,21 +114,21 @@ public class ScriptServiceImpl implements ScriptService {
         script.setId(id);
         script.setCharacters(new Characters());
         script.setScenesRef(new ScenesRef());
-        Jaxb2Marshaller marshaller = ContextHandler.getContext().getBean(Jaxb2Marshaller.class);
+
 
         FileObject scriptsFolder = FileUtil.getConfigFile("Scripts");
+
+        OutputStream outputStream = null;
         try {
             String folderName = uuid.toString();
 
-            if (scriptsFolder.getFileObject(folderName) != null) {
-                throw new IllegalStateException("Folder already exists");
-            }
-
             FileObject folder = scriptsFolder.createFolder(folderName);
+
             FileObject scriptFile = folder.createData(uuid.toString() + SCRIPT_EXT);
-            OutputStream outputStream = scriptFile.getOutputStream();
-            marshaller.marshal(objectFactory.createScript(script), new StreamResult(outputStream));
-            outputStream.close();
+
+
+            outputStream = scriptFile.getOutputStream();
+            writeScript(script, marshaller, outputStream);
 
 
             AddScriptEvent event = new AddScriptEvent(script);
@@ -134,8 +137,75 @@ public class ScriptServiceImpl implements ScriptService {
             scriptsStatistics.openScript(script);
         } catch (IOException e) {
             throw new IllegalStateException(e);
+        } finally {
+
+            IOUtils.closeQuietly(outputStream);
+
         }
 
+    }
+
+    private void writeScript(Script script, Jaxb2Marshaller marshaller, OutputStream outputStream) throws IOException {
+        marshaller.marshal(objectFactory.createScript(script), new StreamResult(outputStream));
+    }
+
+    @Override
+    public void createScene(Script script, String sceneName) {
+        FileObject sceneFolder = getScriptFolder(script.getId());
+
+        Scene scene = new Scene();
+        String sceneIdString = UUID.randomUUID().toString();
+        Id sceneId = new Id();
+        sceneId.setValue(sceneIdString);
+        scene.setId(sceneId);
+        scene.setScriptRef(script.getId());
+
+        SceneRef sceneRef = new SceneRef();
+        sceneRef.setScenRef(sceneId);
+        script.getScenesRef().getScenesRef().add(sceneRef);
+
+        FileObject fileObject = sceneFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
+
+        FileLock lock = null;
+        OutputStream scriptUpdateStream = null;
+        OutputStream sceneUpdateStream = null;
+        try {
+            lock = fileObject.lock();
+            scriptUpdateStream = fileObject.getOutputStream(lock);
+            writeScript(script, marshaller, scriptUpdateStream);
+
+
+            sceneUpdateStream = sceneFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
+            writeScene(scene, marshaller, sceneUpdateStream);
+
+            eventProducerService.addSceneEvent(new AddSceneEvent(scene));
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            if (lock != null) {
+                lock.releaseLock();
+            }
+
+            IOUtils.closeQuietly(sceneUpdateStream);
+            IOUtils.closeQuietly(scriptUpdateStream);
+        }
+    }
+
+    private void writeScene(Scene scene, Jaxb2Marshaller marshaller, OutputStream outputStream) throws IOException {
+        marshaller.marshal(objectFactory.createScene(scene), new StreamResult(outputStream));
+
+    }
+
+    private FileObject getScriptFolder(Id id) {
+
+        FileObject scriptsFolder = FileUtil.getConfigFile("Scripts");
+        FileObject fileObject = scriptsFolder.getFileObject(id.getValue());
+        if (fileObject == null) {
+            throw new IllegalStateException("Script folder doesn't exist");
+        }
+
+        return fileObject;
     }
 
     @Override

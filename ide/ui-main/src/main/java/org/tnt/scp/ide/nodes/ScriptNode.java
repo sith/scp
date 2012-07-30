@@ -8,7 +8,8 @@ import com.google.common.collect.Lists;
 import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
-import org.tnt.scp.common.generated.SceneType;
+import org.tnt.scp.common.generated.Scene;
+import org.tnt.scp.common.generated.SceneRef;
 import org.tnt.scp.common.generated.Script;
 
 import java.util.ArrayList;
@@ -19,22 +20,28 @@ import java.util.ArrayList;
 public class ScriptNode extends AbstractNode {
 
     private final Script script;
+    private static Children children = new Children.Array();
 
     public ScriptNode(Script script) {
-        super(new Children.Array());
+        super(children);
         this.script = script;
         setIconBaseWithExtension("org/tnt/scp/ide/types/script_type.png");
         setName(script.getName());
 
         ArrayList<SceneNode> nodes = Lists.newArrayList();
 
-        for (SceneType scene : script.getScenes().getScene()) {
-            nodes.add(new SceneNode(scene));
+        for (SceneRef sceneRef : script.getScenesRef().getScenesRef()) {
+            nodes.add(new SceneNode(sceneRef));
+
         }
 
-        Children children = getChildren();
         children.add(nodes.toArray(new Node[nodes.size()]));
     }
+
+    public void addScene(Scene sceneRef) {
+        children.add(new Node[]{new SceneNode(sceneRef)});
+    }
+
 
 //    public Image getIcon(int type) {
 //        return Utilities.loadImage("org/netbeans/myfirstexplorer/right-rectangle.png");

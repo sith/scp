@@ -11,17 +11,21 @@ import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.explorer.ExplorerUtils;
 import org.openide.explorer.view.BeanTreeView;
+import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.tnt.scp.common.generated.Id;
+import org.tnt.scp.common.generated.Scene;
 import org.tnt.scp.common.generated.Script;
 import org.tnt.scp.ide.nodes.ChildrenMap;
 import org.tnt.scp.ide.nodes.RootNode;
 import org.tnt.scp.ide.nodes.ScriptNode;
 import org.tnt.scp.uiservices.events.AbstractEvent;
+import org.tnt.scp.uiservices.events.AddSceneEvent;
 import org.tnt.scp.uiservices.events.AddScriptEvent;
 import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.ScriptService;
@@ -72,26 +76,41 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
                 manager.getRootContext().getChildren().add(nodes.toArray(new Node[nodes.size()]));
             }
         });
-        /*scriptTypeResult = Lookup.getDefault().lookup(ScriptService.class).getLookup().lookupResult(AddScriptEvent.class);
-        scriptTypeResult.addLookupListener(new LookupListener() {
+        subscriberService.subscribeAddSceneEvent(new SystemEventListener<AddSceneEvent>() {
             @Override
-            public void resultChanged(LookupEvent ev) {
+            public void onEvent(AddSceneEvent event) {
 
-                ScriptNode newScriptNode = new ScriptNode(scriptTypeResult.allInstances().iterator().next().getTarget());
+                Children children = manager.getRootContext().getChildren();
 
-
-                List<Node> nodes = Lists.asList(newScriptNode, manager.getRootContext().getChildren().getNodes());
-                manager.getRootContext().getChildren().add(nodes.toArray(new Node[nodes.size()]));
-
-
+                Node[] nodes = children.getNodes();
+                for (Node node : nodes) {
+                    ScriptNode scriptNode = (ScriptNode) node;
+                    Scene target = event.getTarget();
+                    Id scriptRef = target.getScriptRef();
+                    if (scriptNode.getScript().getId().equals(scriptRef)) {
+                        scriptNode.addScene(target);
+                    }
+                }
             }
         });
-*/
+
 
         initTree();
         initActions();
-        associateLookup(ExplorerUtils.createLookup(manager, getActionMap()));
-
+        Lookup lookup = ExplorerUtils.createLookup(manager, getActionMap());
+        Lookup.Result<Node> nodeResult = lookup.lookupResult(Node.class);
+        nodeResult.addLookupListener(new LookupListener() {
+            @Override
+            public void resultChanged(LookupEvent ev) {
+                Lookup.Result<Node> res = (Lookup.Result<Node>) ev.getSource();
+                Collection<? extends Node> nodes = res.allInstances();
+                for (Node node : nodes) {
+                    System.out.println(node);
+                }
+                System.out.println("Something selected");
+            }
+        });
+        associateLookup(lookup);
 
 
     }
@@ -147,7 +166,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
     private void initTree() {
 
-      
+
         /*Node[] nodes = new Node[scriptTypes.size()];
         for (Script scriptType : scriptTypes) {
             childrenMap.add(scriptType.getId(), new ScriptNode(scriptType));
@@ -156,7 +175,8 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         ChildrenMap childrenMap = new ChildrenMap();
         RootNode value = new RootNode(childrenMap);
         manager.setRootContext(value);
-          List<Script> scriptTypes = Lookup.getDefault().lookup(ScriptService.class).loadScripts();
+
+        List<Script> scriptTypes = Lookup.getDefault().lookup(ScriptService.class).loadScripts();
     }
 
     private void initActions() {

@@ -9,11 +9,11 @@
    
     <xsd:complexType name="scene">
         <xsd:sequence>
-            <xsd:element name="id" type="common:id"></xsd:element>
-            <xsd:element name="characters" type="common:charactersRef"></xsd:element>
-            <xsd:element name="header" type="tns:header"></xsd:element>
-            <xsd:element name="actions" type="tns:actions"></xsd:element>
-            <xsd:element name="scriptRef" type="common:id"></xsd:element>
+            <xsd:element name="id" type="common:id" ></xsd:element>
+            <xsd:element name="characters" type="common:charactersRef" minOccurs="0"></xsd:element>
+            <xsd:element name="header" type="tns:header" minOccurs="0"></xsd:element>
+            <xsd:element name="actions" type="tns:actions" minOccurs="0" ></xsd:element>
+            <xsd:element name="scriptRef" type="common:id" minOccurs="0"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:element name="scene" type="tns:scene"></xsd:element>

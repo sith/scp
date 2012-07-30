@@ -6,7 +6,12 @@
 
     <bean id="jaxb2Marshaller" class="org.springframework.oxm.jaxb.Jaxb2Marshaller">
         <property name="contextPath" value="org.tnt.scp.common.generated"/>
-        <property name="schema" value="classpath:org/tnt/scp/uiservices/xsd/script.xsd"/>
+        <property name="schemas">
+            <list>
+                <value>org/tnt/scp/uiservices/xsd/script.xsd</value>
+                <value>org/tnt/scp/uiservices/xsd/scene.xsd</value>
+            </list>
+        </property>
     </bean>
 
     <bean id="contextHandler" class="org.tnt.scp.uiservices.installer.ContextHandler"/>

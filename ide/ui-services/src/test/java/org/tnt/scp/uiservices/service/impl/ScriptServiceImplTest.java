@@ -6,10 +6,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
-import org.tnt.scp.common.generated.CharacterType;
-import org.tnt.scp.common.generated.Characters;
-import org.tnt.scp.common.generated.ObjectFactory;
-import org.tnt.scp.common.generated.Script;
+import org.tnt.scp.common.generated.*;
 
 import javax.xml.bind.JAXBElement;
 import javax.xml.transform.stream.StreamResult;
@@ -46,6 +43,22 @@ public class ScriptServiceImplTest {
 
         System.out.println(new String(outputStream.toByteArray()));
 
+
+    }
+
+
+    @Test
+    public void test() throws Exception {
+
+        Id id1 = new Id();
+        id1.setValue("1");
+
+        Id id2 = new Id();
+        id2.setValue("2");
+
+
+        Object o = id1.mergeFrom(id2, id1);
+        System.out.println(o);
 
     }
 }
