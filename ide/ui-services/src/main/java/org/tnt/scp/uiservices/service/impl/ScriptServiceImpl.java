@@ -11,10 +11,12 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.tnt.scp.common.generated.*;
+import org.tnt.scp.uiservices.events.AddCharacterEvent;
 import org.tnt.scp.uiservices.events.AddSceneEvent;
 import org.tnt.scp.uiservices.events.AddScriptEvent;
+import org.tnt.scp.uiservices.events.RemoveCharacterEvent;
 import org.tnt.scp.uiservices.installer.ContextHandler;
-import org.tnt.scp.uiservices.service.EntryStatisticsService;
+import org.tnt.scp.uiservices.service.GlobalContext;
 import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.ScriptService;
 
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -38,15 +41,17 @@ public class ScriptServiceImpl implements ScriptService {
     private InstanceContent content = new InstanceContent();
     private final AbstractLookup abstractLookup;
     private ObjectFactory objectFactory;
-    private final EntryStatisticsService.UpdateService scriptsStatistics;
+    private final GlobalContext.UpdateService scriptsStatistics;
     private final EventSystemService.ProducerService eventProducerService;
     private Jaxb2Marshaller marshaller;
+    private GlobalContext.UpdateService globalContext;
 
     public ScriptServiceImpl() {
         abstractLookup = new AbstractLookup(content);
         objectFactory = new ObjectFactory();
-        scriptsStatistics = Lookup.getDefault().lookup(EntryStatisticsService.UpdateService.class);
+        scriptsStatistics = Lookup.getDefault().lookup(GlobalContext.UpdateService.class);
         eventProducerService = Lookup.getDefault().lookup(EventSystemService.ProducerService.class);
+        globalContext = Lookup.getDefault().lookup(GlobalContext.UpdateService.class);
         marshaller = ContextHandler.getContext().getBean(Jaxb2Marshaller.class);
     }
 
@@ -159,24 +164,27 @@ public class ScriptServiceImpl implements ScriptService {
         sceneId.setValue(sceneIdString);
         scene.setId(sceneId);
         scene.setScriptRef(script.getId());
-
+        Index index = new Index();
+        index.setValue(111111);
+        scene.setIndex(index);
         SceneRef sceneRef = new SceneRef();
         sceneRef.setScenRef(sceneId);
+
         script.getScenesRef().getScenesRef().add(sceneRef);
 
-        FileObject fileObject = sceneFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
+        FileObject scriptFileObject = sceneFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
 
         FileLock lock = null;
         OutputStream scriptUpdateStream = null;
-        OutputStream sceneUpdateStream = null;
+        OutputStream sceneCreateStream = null;
         try {
-            lock = fileObject.lock();
-            scriptUpdateStream = fileObject.getOutputStream(lock);
+            lock = scriptFileObject.lock();
+            scriptUpdateStream = scriptFileObject.getOutputStream(lock);
             writeScript(script, marshaller, scriptUpdateStream);
 
 
-            sceneUpdateStream = sceneFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
-            writeScene(scene, marshaller, sceneUpdateStream);
+            sceneCreateStream = sceneFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
+            writeScene(scene, marshaller, sceneCreateStream);
 
             eventProducerService.addSceneEvent(new AddSceneEvent(scene));
 
@@ -187,8 +195,69 @@ public class ScriptServiceImpl implements ScriptService {
                 lock.releaseLock();
             }
 
-            IOUtils.closeQuietly(sceneUpdateStream);
+            IOUtils.closeQuietly(sceneCreateStream);
             IOUtils.closeQuietly(scriptUpdateStream);
+        }
+    }
+
+
+    @Override
+    public void createCharacter(String characterName, String description, Script selectedScript) {
+
+
+        CharacterType characterType = new CharacterType();
+        characterType.setName(characterName);
+        characterType.setDescription(description);
+        Id value = new Id();
+        value.setValue(UUID.randomUUID().toString());
+        characterType.setId(value);
+
+        selectedScript.getCharacters().getCharacters().add(characterType);
+
+        updateScript(selectedScript);
+
+        eventProducerService.addCharacterEvent(new AddCharacterEvent(characterType, selectedScript));
+        globalContext.updateScript(selectedScript);
+
+    }
+
+    @Override
+    public void deleteCharacter(Id characterId, Script selectedScript) {
+
+        List<CharacterType> characters = selectedScript.getCharacters().getCharacters();
+        for (Iterator<CharacterType> iterator = characters.iterator(); iterator.hasNext(); ) {
+            CharacterType character = iterator.next();
+            if (character.getId().equals(characterId)) {
+                iterator.remove();
+                break;
+            }
+        }
+        updateScript(selectedScript);
+
+        eventProducerService.removeCharacterEvent(new RemoveCharacterEvent(characterId, selectedScript));
+        globalContext.updateScript(selectedScript);
+
+
+    }
+
+    private void updateScript(Script selectedScript) {
+        FileObject scriptFolder = getScriptFolder(selectedScript.getId());
+        FileObject scriptFileObject = scriptFolder.getFileObject(selectedScript.getId().getValue() + SCRIPT_EXT);
+        FileLock lock = null;
+        OutputStream outputStream = null;
+        try {
+            lock = scriptFileObject.lock();
+            outputStream = scriptFileObject.getOutputStream(lock);
+            writeScript(selectedScript, marshaller, outputStream);
+
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        } finally {
+            IOUtils.closeQuietly(outputStream);
+            if (lock != null) {
+                lock.releaseLock();
+            }
+
         }
     }
 

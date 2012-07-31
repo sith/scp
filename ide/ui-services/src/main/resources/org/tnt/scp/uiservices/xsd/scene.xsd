@@ -12,8 +12,10 @@
             <xsd:element name="id" type="common:id" ></xsd:element>
             <xsd:element name="characters" type="common:charactersRef" minOccurs="0"></xsd:element>
             <xsd:element name="header" type="tns:header" minOccurs="0"></xsd:element>
-            <xsd:element name="actions" type="tns:actions" minOccurs="0" ></xsd:element>
+           
             <xsd:element name="scriptRef" type="common:id" minOccurs="0"></xsd:element>
+            <xsd:element name="index" type="common:index"></xsd:element>
+            <xsd:element name="sceneContent" type="tns:sceneContent" minOccurs="0"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:element name="scene" type="tns:scene"></xsd:element>
@@ -24,17 +26,30 @@
             <xsd:element name="timeDescription" type="xsd:string"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
-    <xsd:complexType name="actions">
+    <xsd:complexType name="sceneContent">
         <xsd:sequence>
-            <xsd:element name="actions" type="tns:action" minOccurs="0"></xsd:element>
+            <xsd:element name="actions" type="tns:action" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="replicas" type="tns:replica" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+            <xsd:element name="frames" type="tns:frameDescription" maxOccurs="unbounded" minOccurs="0"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="action">
         <xsd:sequence>
+            <xsd:element name="actionDescription" type="xsd:string"></xsd:element>
+            <xsd:element name="index" type="common:index"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="replica">
+        <xsd:sequence>
             <xsd:element name="characterRef" type="common:characterRef"></xsd:element>
-            <xsd:element name="description" type="xsd:string"></xsd:element>
-            <xsd:element name="note" type="xsd:string"></xsd:element>
-            <xsd:element name="dialog" type="xsd:string"></xsd:element>
+            <xsd:element name="comment" type="xsd:string"></xsd:element>
+            <xsd:element name="text" type="xsd:string"></xsd:element>
+            <xsd:element name="index" type="common:index"></xsd:element>
+        </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="frameDescription">
+        <xsd:sequence>
+            <xsd:element name="value" type="xsd:string"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

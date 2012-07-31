@@ -23,6 +23,7 @@
         <xsd:sequence>
             <xsd:element name="name" type="xsd:string"></xsd:element>
             <xsd:element name="description" type="xsd:string" minOccurs="0"></xsd:element>
+            <xsd:element name="id" type="tns:id"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="scenesRef">
@@ -47,7 +48,7 @@
     </xsd:complexType>
     <xsd:complexType name="index">
         <xsd:sequence>
-            <xsd:element name="value" type="xsd:integer"></xsd:element>
+            <xsd:element name="value" type="xsd:int"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
 </xsd:schema>

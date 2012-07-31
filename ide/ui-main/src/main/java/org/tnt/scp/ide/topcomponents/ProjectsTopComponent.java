@@ -4,7 +4,6 @@
  */
 package org.tnt.scp.ide.topcomponents;
 
-import com.google.common.collect.Lists;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -16,22 +15,26 @@ import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
 import org.tnt.scp.common.generated.Id;
 import org.tnt.scp.common.generated.Scene;
 import org.tnt.scp.common.generated.Script;
 import org.tnt.scp.ide.nodes.ChildrenMap;
 import org.tnt.scp.ide.nodes.RootNode;
 import org.tnt.scp.ide.nodes.ScriptNode;
-import org.tnt.scp.uiservices.events.AbstractEvent;
 import org.tnt.scp.uiservices.events.AddSceneEvent;
 import org.tnt.scp.uiservices.events.AddScriptEvent;
+import org.tnt.scp.uiservices.events.ScriptSelectedEvent;
 import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.ScriptService;
 import org.tnt.scp.uiservices.service.SystemEventListener;
 
-import java.util.*;
+import javax.swing.tree.TreeSelectionModel;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Top component which displays something.
@@ -56,7 +59,9 @@ import java.util.*;
 public final class ProjectsTopComponent extends TopComponent implements ExplorerManager.Provider {
     private final ExplorerManager manager = new ExplorerManager();
 
+
     public ProjectsTopComponent() {
+
         initComponents();
         setName(Bundle.CTL_ProjectsTopComponent());
         setToolTipText(Bundle.HINT_ProjectsTopComponent());
@@ -67,13 +72,13 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         putClientProperty(TopComponent.PROP_UNDOCKING_DISABLED, Boolean.TRUE);
 
 
-        EventSystemService.SubscriberService subscriberService = Lookup.getDefault().lookup(EventSystemService.SubscriberService.class);
+        final EventSystemService.ProducerService eventProducerService = Lookup.getDefault().lookup(EventSystemService.ProducerService.class);
+        final EventSystemService.SubscriberService subscriberService = Lookup.getDefault().lookup(EventSystemService.SubscriberService.class);
         subscriberService.subscribeAddScriptEvent(new SystemEventListener<AddScriptEvent>() {
             @Override
             public void onEvent(AddScriptEvent event) {
                 ScriptNode scriptNode = new ScriptNode(event.getTarget());
-                List<Node> nodes = Lists.asList(scriptNode, manager.getRootContext().getChildren().getNodes());
-                manager.getRootContext().getChildren().add(nodes.toArray(new Node[nodes.size()]));
+                manager.getRootContext().getChildren().add(new Node[]{scriptNode});
             }
         });
         subscriberService.subscribeAddSceneEvent(new SystemEventListener<AddSceneEvent>() {
@@ -84,12 +89,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
 
                 Node[] nodes = children.getNodes();
                 for (Node node : nodes) {
-                    ScriptNode scriptNode = (ScriptNode) node;
-                    Scene target = event.getTarget();
-                    Id scriptRef = target.getScriptRef();
-                    if (scriptNode.getScript().getId().equals(scriptRef)) {
-                        scriptNode.addScene(target);
-                    }
+
                 }
             }
         });
@@ -98,21 +98,30 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
         initTree();
         initActions();
         Lookup lookup = ExplorerUtils.createLookup(manager, getActionMap());
-        Lookup.Result<Node> nodeResult = lookup.lookupResult(Node.class);
-        nodeResult.addLookupListener(new LookupListener() {
+
+        Lookup.Result<ScriptNode> scriptNodesResult = lookup.lookupResult(ScriptNode.class);
+        scriptNodesResult.addLookupListener(new LookupListener() {
             @Override
             public void resultChanged(LookupEvent ev) {
                 Lookup.Result<Node> res = (Lookup.Result<Node>) ev.getSource();
-                Collection<? extends Node> nodes = res.allInstances();
-                for (Node node : nodes) {
-                    System.out.println(node);
-                }
-                System.out.println("Something selected");
+                Collection<ScriptNode> scriptNodes = (Collection<ScriptNode>) res.allInstances();
+                eventProducerService.selectScript(new ScriptSelectedEvent(scriptNodes.iterator().next().getScript()));
+
             }
         });
+
+
+
+
         associateLookup(lookup);
 
 
+    }
+
+    private BeanTreeView createTreeView() {
+        BeanTreeView beanTreeView = new BeanTreeView();
+        beanTreeView.setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        return beanTreeView;
     }
 
     /**
@@ -123,8 +132,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        projectsPane = new BeanTreeView();
-        ;
+        projectsPane = createTreeView();
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);

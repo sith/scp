@@ -8,9 +8,7 @@ import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
-import org.tnt.scp.uiservices.events.AbstractEvent;
-import org.tnt.scp.uiservices.events.AddSceneEvent;
-import org.tnt.scp.uiservices.events.AddScriptEvent;
+import org.tnt.scp.uiservices.events.*;
 import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.SystemEventListener;
 
@@ -25,6 +23,12 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
 
     private final Lookup.Result<AddScriptEvent> addScriptEventResult;
     private final Lookup.Result<AddSceneEvent> addSceneEventResult;
+    private Lookup.Result<ScriptSelectedEvent> selectScriptEventResult;
+    private InstanceContent secletScriptContent;
+    private InstanceContent addCharacterContent;
+    private Lookup.Result<AddCharacterEvent> addCharacterEventResult;
+    private InstanceContent removeCharacterContent;
+    private Lookup.Result<AddCharacterEvent> removeCharacterEventResult;
 
     public SystemEventServiceImpl() {
         addScriptsContent = new InstanceContent();
@@ -32,6 +36,15 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
 
         addSceneContent = new InstanceContent();
         addSceneEventResult = new AbstractLookup(addSceneContent).lookupResult(AddSceneEvent.class);
+
+        secletScriptContent = new InstanceContent();
+        selectScriptEventResult = new AbstractLookup(secletScriptContent).lookupResult(ScriptSelectedEvent.class);
+
+        addCharacterContent = new InstanceContent();
+        addCharacterEventResult = new AbstractLookup(addCharacterContent).lookupResult(AddCharacterEvent.class);
+
+        removeCharacterContent = new InstanceContent();
+        removeCharacterEventResult = new AbstractLookup(removeCharacterContent).lookupResult(AddCharacterEvent.class);
 
     }
 
@@ -54,6 +67,39 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
     @Override
     public void subscribeAddSceneEvent(SystemEventListener<AddSceneEvent> listener) {
         addSceneEventResult.addLookupListener(new ProxyLookupListener<AddSceneEvent>(listener));
+    }
+
+    @Override
+    public void subscribeScriptSelectedEvent(SystemEventListener<ScriptSelectedEvent> listener) {
+        selectScriptEventResult.addLookupListener(new ProxyLookupListener<ScriptSelectedEvent>(listener));
+    }
+
+    @Override
+    public void subscribeAddCharacterEvent(SystemEventListener<AddCharacterEvent> listener) {
+
+        addCharacterEventResult.addLookupListener(new ProxyLookupListener<AddCharacterEvent>(listener));
+
+    }
+
+    @Override
+    public void subscribeRemoveCharacterEvent(SystemEventListener<RemoveCharacterEvent> listener) {
+        removeCharacterEventResult.addLookupListener(new ProxyLookupListener<RemoveCharacterEvent>(listener));
+    }
+
+    @Override
+    public void selectScript(ScriptSelectedEvent scriptSelectedEvent) {
+        secletScriptContent.set(Lists.newArrayList(scriptSelectedEvent), null);
+    }
+
+    @Override
+    public void addCharacterEvent(AddCharacterEvent addCharacterEvent) {
+        addCharacterContent.set(Lists.newArrayList(addCharacterEvent), null);
+
+    }
+
+    @Override
+    public void removeCharacterEvent(RemoveCharacterEvent removeCharacterEvent) {
+        removeCharacterContent.set(Lists.newArrayList(removeCharacterEvent), null);
     }
 
     private static class ProxyLookupListener<T extends AbstractEvent> implements LookupListener {

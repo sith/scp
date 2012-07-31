@@ -20,38 +20,17 @@ import java.util.ArrayList;
 public class ScriptNode extends AbstractNode {
 
     private final Script script;
-    private static Children children = new Children.Array();
+
 
     public ScriptNode(Script script) {
-        super(children);
+        super(new Children.Array());
         this.script = script;
         setIconBaseWithExtension("org/tnt/scp/ide/types/script_type.png");
         setName(script.getName());
 
-        ArrayList<SceneNode> nodes = Lists.newArrayList();
+        getChildren().add(new Node[]{new ScenesNode(script), new CharactersNode(script)});
 
-        for (SceneRef sceneRef : script.getScenesRef().getScenesRef()) {
-            nodes.add(new SceneNode(sceneRef));
-
-        }
-
-        children.add(nodes.toArray(new Node[nodes.size()]));
     }
-
-    public void addScene(Scene sceneRef) {
-        children.add(new Node[]{new SceneNode(sceneRef)});
-    }
-
-
-//    public Image getIcon(int type) {
-//        return Utilities.loadImage("org/netbeans/myfirstexplorer/right-rectangle.png");
-//    }
-//    
-//    public Image getOpenedIcon(int type) {
-//        return Utilities.loadImage("org/netbeans/myfirstexplorer/down-rectangle.png");
-//    }
-
-
     public Script getScript() {
         return script;
     }

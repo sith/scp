@@ -35,17 +35,6 @@ import org.tnt.scp.uiservices.service.ScriptService;
 @Messages("CTL_NewScript=New Script")
 public final class NewScriptAction extends AbstractAction {
 
-    //
-//    public void actionPerformed(ActionEvent e) {
-//        // TODO implement action body
-//        Lookup lookup = Lookups.forPath("Action/Scripts/Editor");
-//        
-//        Collection<? extends Action> lookupAll = lookup.lookupAll(Action.class);
-//        for (Action action : lookupAll) {
-//            System.out.println(action);
-//        }
-//     
-//    }
     @Override
     public void actionPerformed(ActionEvent e) {
 
@@ -55,9 +44,11 @@ public final class NewScriptAction extends AbstractAction {
                 "New Script",
                 "Please enter script name");
 
-        DialogDisplayer.getDefault().notify(dialog);
+        Object notify = DialogDisplayer.getDefault().notify(dialog);
 
-        scriptService.createScript(dialog.getInputText());
+        if (NotifyDescriptor.OK_OPTION == notify) {
+            scriptService.createScript(dialog.getInputText());
+        }
 
 
     }

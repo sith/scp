@@ -11,6 +11,9 @@
       <com:name>string</com:name>
       <!--Optional:-->
       <com:description>string</com:description>
+      <com:id>
+        <com:value>string</com:value>
+      </com:id>
     </com:characters>
   </scr:characters>
   <scr:scenesRef>

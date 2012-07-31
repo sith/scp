@@ -7,8 +7,18 @@ package org.tnt.scp.ide.topcomponents;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
+import org.openide.explorer.ExplorerManager;
+import org.openide.util.Lookup;
 import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
+import org.tnt.scp.common.generated.CharacterType;
+import org.tnt.scp.uiservices.events.AddCharacterEvent;
+import org.tnt.scp.uiservices.events.RemoveCharacterEvent;
+import org.tnt.scp.uiservices.events.ScriptSelectedEvent;
+import org.tnt.scp.uiservices.service.EventSystemService;
+import org.tnt.scp.uiservices.service.SystemEventListener;
+
+import java.util.List;
 
 /**
  * Top component which displays something.
@@ -31,13 +41,47 @@ import org.openide.util.NbBundle.Messages;
         "CTL_ScenesTopComponent=Scenes",
         "HINT_ScenesTopComponent=This is a Scenes window"
 })
-public final class ScenesTopComponent extends TopComponent {
+public final class ScenesTopComponent extends TopComponent implements ExplorerManager.Provider {
+
+    private ExplorerManager explorerManager = new ExplorerManager();
 
     public ScenesTopComponent() {
         initComponents();
         setName(Bundle.CTL_ScenesTopComponent());
         setToolTipText(Bundle.HINT_ScenesTopComponent());
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
+
+
+        final EventSystemService.SubscriberService subscriberService = Lookup.getDefault().lookup(EventSystemService.SubscriberService.class);
+        subscriberService.subscribeScriptSelectedEvent(new SystemEventListener<ScriptSelectedEvent>() {
+            @Override
+            public void onEvent(ScriptSelectedEvent event) {
+                System.out.println("ScriptsSelected");
+
+                System.out.println(event.getTarget());
+
+            }
+        });
+
+        subscriberService.subscribeAddCharacterEvent(new SystemEventListener<AddCharacterEvent>() {
+            @Override
+            public void onEvent(AddCharacterEvent event) {
+                System.err.println(event.getScript());
+
+                List<CharacterType> characters = event.getScript().getCharacters().getCharacters();
+                for (CharacterType character : characters) {
+                    System.out.println(character);
+                }
+
+            }
+        });
+        subscriberService.subscribeRemoveCharacterEvent(new SystemEventListener<RemoveCharacterEvent>() {
+            @Override
+            public void onEvent(RemoveCharacterEvent event) {
+                System.err.println("REMOVED " + event.getScript());
+            }
+        });
+
 
     }
 
@@ -83,5 +127,10 @@ public final class ScenesTopComponent extends TopComponent {
     void readProperties(java.util.Properties p) {
         String version = p.getProperty("version");
         // TODO read your settings according to their version
+    }
+
+    @Override
+    public ExplorerManager getExplorerManager() {
+        return explorerManager;
     }
 }

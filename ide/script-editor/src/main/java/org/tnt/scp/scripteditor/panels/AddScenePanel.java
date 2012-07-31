@@ -14,10 +14,9 @@ import java.util.List;
 /**
  * @author sith
  */
-public class AddScenePanel extends javax.swing.JPanel {
-
-    private final List<Script> scripts;
-    private final DefaultComboBoxModel comboBoxModel;
+public class AddScenePanel extends JPanel {
+    protected final List<Script> scripts;
+    protected final DefaultComboBoxModel comboBoxModel;
 
     /**
      * Creates new form AddScenePanel
@@ -31,10 +30,10 @@ public class AddScenePanel extends javax.swing.JPanel {
         comboBoxModel = new DefaultComboBoxModel();
         for (Script script : scripts) {
             comboBoxModel.addElement(script.getName());
-
         }
         initComponents();
     }
+
 
     /**
      * This method is called from within the constructor to initialize the form.

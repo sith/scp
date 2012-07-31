@@ -1,6 +1,7 @@
 package org.tnt.scp.uiservices.service.impl;
 
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.core.io.ClassPathResource;
@@ -14,6 +15,7 @@ import javax.xml.transform.stream.StreamSource;
 import java.io.ByteArrayOutputStream;
 import java.util.UUID;
 
+@Ignore
 public class ScriptServiceImplTest {
     @Test
     public void testFake() throws Exception {
