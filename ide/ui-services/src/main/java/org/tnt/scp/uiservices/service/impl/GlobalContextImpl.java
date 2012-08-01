@@ -1,22 +1,23 @@
 package org.tnt.scp.uiservices.service.impl;
 
-import com.google.common.collect.Lists;
-import org.openide.util.Lookup;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import org.tnt.scp.common.generated.Id;
+import org.tnt.scp.common.generated.SceneRef;
 import org.tnt.scp.common.generated.Script;
+import org.tnt.scp.uiservices.context.SceneContext;
+import org.tnt.scp.uiservices.context.ScriptContext;
 import org.tnt.scp.uiservices.service.GlobalContext;
 
 import java.util.*;
 
 
 @ServiceProviders({
-        @ServiceProvider(service = GlobalContext.AwareSerice.class),
+        @ServiceProvider(service = GlobalContext.AwareService.class),
         @ServiceProvider(service = GlobalContext.UpdateService.class)})
-public class GlobalContextImpl implements GlobalContext.AwareSerice, GlobalContext.UpdateService {
+public class GlobalContextImpl implements GlobalContext.AwareService, GlobalContext.UpdateService {
 
 
     private Map<Id, ScriptContext> scriptContexts;
@@ -35,6 +36,11 @@ public class GlobalContextImpl implements GlobalContext.AwareSerice, GlobalConte
 
 
     @Override
+    public ScriptContext findScriptContext(Id id) {
+        return scriptContexts.get(id);
+    }
+
+    @Override
     public Script findScriptById(Id id) {
         return scriptContexts.get(id).getScript();
     }
@@ -46,9 +52,12 @@ public class GlobalContextImpl implements GlobalContext.AwareSerice, GlobalConte
 
     @Override
     public void openScript(Script scriptType) {
-        scriptContexts.put(scriptType.getId(), new ScriptContext(scriptType, new ArrayList<SceneContext>()));
+        scriptContexts.put(scriptType.getId(), new ScriptContext(scriptType));
         openedScriptsContent.add(scriptType);
     }
+
+
+
 
     @Override
     public void closeScript(Script scriptType) {
@@ -59,6 +68,15 @@ public class GlobalContextImpl implements GlobalContext.AwareSerice, GlobalConte
 
     @Override
     public void updateScript(Script selectedScript) {
-        scriptContexts.put(selectedScript.getId(), new ScriptContext(selectedScript, new ArrayList<SceneContext>()));
+        scriptContexts.put(selectedScript.getId(), new ScriptContext(selectedScript));
+    }
+
+    @Override
+    public void updateScene(SceneRef sceneRef, Id scriptId) {
+
+        ScriptContext scriptContext = scriptContexts.get(scriptId);
+        scriptContext.updateSceneContext(new SceneContext(sceneRef, scriptId));
+
+
     }
 }

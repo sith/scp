@@ -146,6 +146,7 @@
                 <configuration>
                     <publicPackages>
                         <publicPackage>org.tnt.scp.common.generated</publicPackage>
+                        <publicPackage>org.tnt.scp.uiservices.context</publicPackage>
                         <publicPackage>org.tnt.scp.uiservices.events</publicPackage>
                         <publicPackage>org.tnt.scp.uiservices.service</publicPackage>
                     </publicPackages>

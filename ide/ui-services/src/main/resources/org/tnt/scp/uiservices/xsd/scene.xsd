@@ -14,7 +14,6 @@
             <xsd:element name="header" type="tns:header" minOccurs="0"></xsd:element>
            
             <xsd:element name="scriptRef" type="common:id" minOccurs="0"></xsd:element>
-            <xsd:element name="index" type="common:index"></xsd:element>
             <xsd:element name="sceneContent" type="tns:sceneContent" minOccurs="0"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>

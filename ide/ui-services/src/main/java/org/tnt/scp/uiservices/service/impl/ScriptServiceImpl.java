@@ -164,13 +164,16 @@ public class ScriptServiceImpl implements ScriptService {
         sceneId.setValue(sceneIdString);
         scene.setId(sceneId);
         scene.setScriptRef(script.getId());
-        Index index = new Index();
-        index.setValue(111111);
-        scene.setIndex(index);
-        SceneRef sceneRef = new SceneRef();
-        sceneRef.setScenRef(sceneId);
+        SceneRef sceneRefs = new SceneRef();
+        sceneRefs.setScenRef(sceneId);
 
-        script.getScenesRef().getScenesRef().add(sceneRef);
+        List<SceneRef> scenesRef = script.getScenesRef().getScenesRef();
+        scenesRef.add(sceneRefs);
+        Index sceneIndex = new Index();
+        sceneIndex.setValue(scenesRef.size());
+        sceneRefs.setIndex(sceneIndex);
+
+        sceneRefs.setShortName(sceneName);
 
         FileObject scriptFileObject = sceneFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
 
@@ -185,16 +188,14 @@ public class ScriptServiceImpl implements ScriptService {
 
             sceneCreateStream = sceneFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
             writeScene(scene, marshaller, sceneCreateStream);
-
+            globalContext.updateScene(sceneRefs, script.getId());
             eventProducerService.addSceneEvent(new AddSceneEvent(scene));
-
         } catch (IOException e) {
             throw new IllegalStateException(e);
         } finally {
             if (lock != null) {
                 lock.releaseLock();
             }
-
             IOUtils.closeQuietly(sceneCreateStream);
             IOUtils.closeQuietly(scriptUpdateStream);
         }

@@ -34,6 +34,8 @@
     <xsd:complexType name="sceneRef">
         <xsd:sequence>
             <xsd:element name="scenRef" type="tns:id"></xsd:element>
+            <xsd:element name="shortName" type="xsd:string"></xsd:element>
+            <xsd:element name="index" type="tns:index"></xsd:element>
         </xsd:sequence>
     </xsd:complexType>
     <xsd:complexType name="charactersRef">

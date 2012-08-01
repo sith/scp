@@ -4,6 +4,9 @@
  */
 package org.tnt.scp.ide.topcomponents;
 
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Lists;
+import org.apache.commons.collections.CollectionUtils;
 import org.netbeans.api.settings.ConvertAsProperties;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
@@ -17,6 +20,7 @@ import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
 import org.tnt.scp.common.generated.Id;
 import org.tnt.scp.common.generated.Scene;
 import org.tnt.scp.common.generated.Script;
@@ -81,18 +85,6 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
                 manager.getRootContext().getChildren().add(new Node[]{scriptNode});
             }
         });
-        subscriberService.subscribeAddSceneEvent(new SystemEventListener<AddSceneEvent>() {
-            @Override
-            public void onEvent(AddSceneEvent event) {
-
-                Children children = manager.getRootContext().getChildren();
-
-                Node[] nodes = children.getNodes();
-                for (Node node : nodes) {
-
-                }
-            }
-        });
 
 
         initTree();
@@ -105,12 +97,13 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
             public void resultChanged(LookupEvent ev) {
                 Lookup.Result<Node> res = (Lookup.Result<Node>) ev.getSource();
                 Collection<ScriptNode> scriptNodes = (Collection<ScriptNode>) res.allInstances();
-                eventProducerService.selectScript(new ScriptSelectedEvent(scriptNodes.iterator().next().getScript()));
+                if (CollectionUtils.isEmpty(scriptNodes)) {
+                    return;
+                }
 
+                eventProducerService.selectScript(new ScriptSelectedEvent(scriptNodes.iterator().next().getScript()));
             }
         });
-
-
 
 
         associateLookup(lookup);
@@ -152,6 +145,7 @@ public final class ProjectsTopComponent extends TopComponent implements Explorer
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {
+
         // TODO add custom code on component opening
     }
 

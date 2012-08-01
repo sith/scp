@@ -9,16 +9,18 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.explorer.ExplorerManager;
 import org.openide.util.Lookup;
-import org.openide.windows.TopComponent;
 import org.openide.util.NbBundle.Messages;
-import org.tnt.scp.common.generated.CharacterType;
-import org.tnt.scp.uiservices.events.AddCharacterEvent;
-import org.tnt.scp.uiservices.events.RemoveCharacterEvent;
+import org.openide.windows.TopComponent;
+import org.tnt.scp.common.generated.Id;
+import org.tnt.scp.ide.panels.ScenesPanel;
 import org.tnt.scp.uiservices.events.ScriptSelectedEvent;
 import org.tnt.scp.uiservices.service.EventSystemService;
+import org.tnt.scp.uiservices.service.GlobalContext;
 import org.tnt.scp.uiservices.service.SystemEventListener;
 
-import java.util.List;
+import java.awt.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Top component which displays something.
@@ -42,43 +44,34 @@ import java.util.List;
         "HINT_ScenesTopComponent=This is a Scenes window"
 })
 public final class ScenesTopComponent extends TopComponent implements ExplorerManager.Provider {
-
+    private final Map<Id, ScenesPanel> scenePanels = new HashMap<Id, ScenesPanel>();
     private ExplorerManager explorerManager = new ExplorerManager();
+    private BorderLayout mainPanelLayout;
 
     public ScenesTopComponent() {
         initComponents();
         setName(Bundle.CTL_ScenesTopComponent());
         setToolTipText(Bundle.HINT_ScenesTopComponent());
         putClientProperty(TopComponent.PROP_MAXIMIZATION_DISABLED, Boolean.TRUE);
-
+        final GlobalContext.AwareService globalContextAware =
+                Lookup.getDefault().lookup(GlobalContext.AwareService.class);
 
         final EventSystemService.SubscriberService subscriberService = Lookup.getDefault().lookup(EventSystemService.SubscriberService.class);
         subscriberService.subscribeScriptSelectedEvent(new SystemEventListener<ScriptSelectedEvent>() {
             @Override
             public void onEvent(ScriptSelectedEvent event) {
-                System.out.println("ScriptsSelected");
-
-                System.out.println(event.getTarget());
-
-            }
-        });
-
-        subscriberService.subscribeAddCharacterEvent(new SystemEventListener<AddCharacterEvent>() {
-            @Override
-            public void onEvent(AddCharacterEvent event) {
-                System.err.println(event.getScript());
-
-                List<CharacterType> characters = event.getScript().getCharacters().getCharacters();
-                for (CharacterType character : characters) {
-                    System.out.println(character);
+                Id id = event.getTarget().getId();
+                ScenesPanel scenesPanel = scenePanels.get(id);
+                if (scenesPanel == null) {
+                    scenesPanel = new ScenesPanel(globalContextAware.findScriptContext(id));
+                    scenesPanel.setVisible(true);
+                    scenePanels.put(id, scenesPanel);
                 }
+                mainPanel.removeAll();
 
-            }
-        });
-        subscriberService.subscribeRemoveCharacterEvent(new SystemEventListener<RemoveCharacterEvent>() {
-            @Override
-            public void onEvent(RemoveCharacterEvent event) {
-                System.err.println("REMOVED " + event.getScript());
+                mainPanel.add(scenesPanel, 0);
+                mainPanel.updateUI();
+
             }
         });
 
@@ -93,19 +86,27 @@ public final class ScenesTopComponent extends TopComponent implements ExplorerMa
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        mainPanel = new javax.swing.JPanel();
+
+        mainPanelLayout = new BorderLayout();
+        mainPanel.setLayout(mainPanelLayout);
+
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 400, Short.MAX_VALUE)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
                 layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addGap(0, 300, Short.MAX_VALUE)
+                        .addComponent(mainPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel mainPanel;
+
     // End of variables declaration//GEN-END:variables
     @Override
     public void componentOpened() {

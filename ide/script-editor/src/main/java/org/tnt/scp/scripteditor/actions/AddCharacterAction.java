@@ -15,9 +15,7 @@ import org.openide.awt.*;
 import org.openide.util.ImageUtilities;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
-import org.tnt.scp.common.generated.Script;
 import org.tnt.scp.scripteditor.panels.AddCharacterPanel;
-import org.tnt.scp.scripteditor.panels.AddScenePanel;
 import org.tnt.scp.uiservices.service.GlobalContext;
 import org.tnt.scp.uiservices.service.ScriptService;
 
@@ -37,9 +35,9 @@ public final class AddCharacterAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        GlobalContext.AwareSerice awareSerice = Lookup.getDefault().lookup(GlobalContext.AwareSerice.class);
+        GlobalContext.AwareService awareService = Lookup.getDefault().lookup(GlobalContext.AwareService.class);
 
-        final AddCharacterPanel panel = new AddCharacterPanel(awareSerice.openedScripts());
+        final AddCharacterPanel panel = new AddCharacterPanel(awareService.openedScripts());
 
         final DialogDescriptor d = new DialogDescriptor(panel, "Add New Scene", true, null);
         d.setClosingOptions(null);

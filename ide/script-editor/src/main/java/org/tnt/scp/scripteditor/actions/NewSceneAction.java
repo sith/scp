@@ -36,9 +36,9 @@ import org.tnt.scp.uiservices.service.ScriptService;
 public final class NewSceneAction extends AbstractAction {
 
     public void actionPerformed(ActionEvent e) {
-        GlobalContext.AwareSerice awareSerice = Lookup.getDefault().lookup(GlobalContext.AwareSerice.class);
+        GlobalContext.AwareService awareService = Lookup.getDefault().lookup(GlobalContext.AwareService.class);
 
-        final AddScenePanel panel = new AddScenePanel(awareSerice.openedScripts());
+        final AddScenePanel panel = new AddScenePanel(awareService.openedScripts());
 
         final DialogDescriptor d = new DialogDescriptor(panel, "Add New Scene", true, null);
         d.setClosingOptions(null);
@@ -62,7 +62,7 @@ public final class NewSceneAction extends AbstractAction {
             ScriptService scriptService = Lookup.getDefault().lookup(ScriptService.class);
             scriptService.createScene(panel.getSelectedScript(), panel.getSceneName());
 
-            Script scriptById = Lookup.getDefault().lookup(GlobalContext.AwareSerice.class).findScriptById(panel.getSelectedScript().getId());
+            Script scriptById = Lookup.getDefault().lookup(GlobalContext.AwareService.class).findScriptById(panel.getSelectedScript().getId());
             System.out.println(scriptById);
 
         }
