@@ -4,6 +4,8 @@
     <folder name="Actions">
         <folder name="Scripts">
             <folder name="Editor"/>
+            <folder name="ScenesToolbar">              
+            </folder>
         </folder>
     </folder>
     <folder name="Toolbars">

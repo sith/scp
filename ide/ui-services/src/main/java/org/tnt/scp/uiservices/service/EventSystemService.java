@@ -15,6 +15,8 @@ public interface EventSystemService {
         public void subscribeAddCharacterEvent(SystemEventListener<AddCharacterEvent> listener);
 
         public void subscribeRemoveCharacterEvent(SystemEventListener<RemoveCharacterEvent> listener);
+
+        public void subscribeRemoveSceneEvent(SystemEventListener<RemoveSceneEvent> listener);
     }
 
     public static interface ProducerService {
@@ -27,5 +29,7 @@ public interface EventSystemService {
         void addCharacterEvent(AddCharacterEvent addCharacterEvent);
 
         void removeCharacterEvent(RemoveCharacterEvent removeCharacterEvent);
+
+        void removeSceneEvent(RemoveSceneEvent removeSceneEvent);
     }
 }

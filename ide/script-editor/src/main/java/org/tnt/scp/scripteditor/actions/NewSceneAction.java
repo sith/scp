@@ -27,7 +27,7 @@ import org.tnt.scp.uiservices.service.ScriptService;
         id = "org.tnt.scp.scripteditor.actions.NewSceneAction")
 @ActionRegistration(iconBase = "org/tnt/scp/scripteditor/actions/new_scene.png",
         displayName = "#CTL_NewSceneAction")
-@ActionReferences({
+@ActionReferences({        
         @ActionReference(path = "Menu/File", position = 1350),
         @ActionReference(path = "Toolbars/ScriptsEditor", position = 3433),
         @ActionReference(path = "Shortcuts", name = "DO-S")

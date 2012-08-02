@@ -11,10 +11,8 @@ import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ServiceProvider;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 import org.tnt.scp.common.generated.*;
-import org.tnt.scp.uiservices.events.AddCharacterEvent;
-import org.tnt.scp.uiservices.events.AddSceneEvent;
-import org.tnt.scp.uiservices.events.AddScriptEvent;
-import org.tnt.scp.uiservices.events.RemoveCharacterEvent;
+import org.tnt.scp.uiservices.context.ScriptContext;
+import org.tnt.scp.uiservices.events.*;
 import org.tnt.scp.uiservices.installer.ContextHandler;
 import org.tnt.scp.uiservices.service.GlobalContext;
 import org.tnt.scp.uiservices.service.EventSystemService;
@@ -44,14 +42,16 @@ public class ScriptServiceImpl implements ScriptService {
     private final GlobalContext.UpdateService scriptsStatistics;
     private final EventSystemService.ProducerService eventProducerService;
     private Jaxb2Marshaller marshaller;
-    private GlobalContext.UpdateService globalContext;
+    private GlobalContext.UpdateService globalContextUpdater;
+    private GlobalContext.AwareService globalContextAware;
 
     public ScriptServiceImpl() {
         abstractLookup = new AbstractLookup(content);
         objectFactory = new ObjectFactory();
         scriptsStatistics = Lookup.getDefault().lookup(GlobalContext.UpdateService.class);
         eventProducerService = Lookup.getDefault().lookup(EventSystemService.ProducerService.class);
-        globalContext = Lookup.getDefault().lookup(GlobalContext.UpdateService.class);
+        globalContextUpdater = Lookup.getDefault().lookup(GlobalContext.UpdateService.class);
+        globalContextAware = Lookup.getDefault().lookup(GlobalContext.AwareService.class);
         marshaller = ContextHandler.getContext().getBean(Jaxb2Marshaller.class);
     }
 
@@ -156,7 +156,7 @@ public class ScriptServiceImpl implements ScriptService {
 
     @Override
     public void createScene(Script script, String sceneName) {
-        FileObject sceneFolder = getScriptFolder(script.getId());
+        FileObject scriptFolder = getScriptFolder(script.getId());
 
         Scene scene = new Scene();
         String sceneIdString = UUID.randomUUID().toString();
@@ -175,7 +175,7 @@ public class ScriptServiceImpl implements ScriptService {
 
         sceneRefs.setShortName(sceneName);
 
-        FileObject scriptFileObject = sceneFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
+        FileObject scriptFileObject = scriptFolder.getFileObject(script.getId().getValue() + SCRIPT_EXT);
 
         FileLock lock = null;
         OutputStream scriptUpdateStream = null;
@@ -186,9 +186,9 @@ public class ScriptServiceImpl implements ScriptService {
             writeScript(script, marshaller, scriptUpdateStream);
 
 
-            sceneCreateStream = sceneFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
+            sceneCreateStream = scriptFolder.createData(sceneIdString + SCENE_EXT).getOutputStream();
             writeScene(scene, marshaller, sceneCreateStream);
-            globalContext.updateScene(sceneRefs, script.getId());
+            globalContextUpdater.updateScene(sceneRefs, script.getId());
             eventProducerService.addSceneEvent(new AddSceneEvent(scene));
         } catch (IOException e) {
             throw new IllegalStateException(e);
@@ -218,7 +218,7 @@ public class ScriptServiceImpl implements ScriptService {
         updateScript(selectedScript);
 
         eventProducerService.addCharacterEvent(new AddCharacterEvent(characterType, selectedScript));
-        globalContext.updateScript(selectedScript);
+        globalContextUpdater.updateScript(selectedScript);
 
     }
 
@@ -236,7 +236,33 @@ public class ScriptServiceImpl implements ScriptService {
         updateScript(selectedScript);
 
         eventProducerService.removeCharacterEvent(new RemoveCharacterEvent(characterId, selectedScript));
-        globalContext.updateScript(selectedScript);
+        globalContextUpdater.updateScript(selectedScript);
+
+
+    }
+
+    @Override
+    public void removeScene(SceneRef sceneRef, Id scriptId) {
+
+        ScriptContext scriptContext = globalContextAware.findScriptContext(scriptId);
+        Script script = scriptContext.getScript();
+        for (Iterator<SceneRef> iterator = script.getScenesRef().getScenesRef().iterator(); iterator.hasNext(); ) {
+            SceneRef ref = iterator.next();
+            if (ref.getScenRef().equals(sceneRef.getScenRef())) {
+                iterator.remove();
+            }
+        }
+
+
+        try {
+            updateScript(script);
+            FileObject scriptFolder = getScriptFolder(script.getId());
+            scriptFolder.getFileObject(sceneRef.getScenRef().getValue() + SCENE_EXT).delete();
+            globalContextUpdater.updateScript(script);
+            eventProducerService.removeSceneEvent(new RemoveSceneEvent(sceneRef));
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
 
 
     }

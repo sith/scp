@@ -11,7 +11,10 @@ import org.openide.nodes.AbstractNode;
 import org.openide.nodes.Children;
 import org.openide.nodes.Node;
 import org.openide.util.Lookup;
+import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
 import org.tnt.scp.ide.nodes.SceneNode;
+import org.tnt.scp.ide.topcomponents.ScenesTopComponent;
 import org.tnt.scp.uiservices.events.AddSceneEvent;
 import org.tnt.scp.uiservices.service.EventSystemService;
 import org.tnt.scp.uiservices.service.GlobalContext;
@@ -21,6 +24,7 @@ import org.tnt.scp.uiservices.context.ScriptContext;
 
 import javax.swing.*;
 import java.util.Collection;
+import java.util.List;
 
 /**
  * @author sith
@@ -32,7 +36,7 @@ public class ScenesPanel extends javax.swing.JPanel implements ExplorerManager.P
     /**
      * Creates new form ScenesPanel
      */
-    public ScenesPanel(final ScriptContext scriptContext) {
+    public ScenesPanel(final ScriptContext scriptContext,ScenesTopComponent topComponent) {
         initComponents();
         Collection<Node> scenes = Lists.newArrayList();
         for (SceneContext scene : scriptContext.getSceneContexts()) {
@@ -62,6 +66,10 @@ public class ScenesPanel extends javax.swing.JPanel implements ExplorerManager.P
             }
         });
 
+        List<? extends Action> alist = Utilities.actionsForPath("Actions/Scripts/ScenesToolbar/");
+        for (Action action : alist) {
+            scenesToolbar.add(action);
+        }
     }
 
     /**

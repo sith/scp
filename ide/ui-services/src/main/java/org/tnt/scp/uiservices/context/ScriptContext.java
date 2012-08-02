@@ -32,6 +32,10 @@ public class ScriptContext {
         return sceneContexts.get(id);
     }
 
+    public void removeSceneContextById(Id id) {
+        sceneContexts.remove(id);
+    }
+
     public List<SceneContext> getSceneContexts() {
         ArrayList<SceneContext> sortedList = Lists.newArrayList(sceneContexts.values());
         Collections.sort(sortedList, new Comparator<SceneContext>() {

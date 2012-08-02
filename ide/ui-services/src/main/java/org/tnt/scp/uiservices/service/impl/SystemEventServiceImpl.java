@@ -29,6 +29,8 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
     private Lookup.Result<AddCharacterEvent> addCharacterEventResult;
     private InstanceContent removeCharacterContent;
     private Lookup.Result<AddCharacterEvent> removeCharacterEventResult;
+    private InstanceContent removeSceneContent;
+    private Lookup.Result<RemoveSceneEvent> removeSceneEventResult;
 
     public SystemEventServiceImpl() {
         addScriptsContent = new InstanceContent();
@@ -45,6 +47,10 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
 
         removeCharacterContent = new InstanceContent();
         removeCharacterEventResult = new AbstractLookup(removeCharacterContent).lookupResult(AddCharacterEvent.class);
+
+
+        removeSceneContent = new InstanceContent();
+        removeSceneEventResult = new AbstractLookup(removeSceneContent).lookupResult(RemoveSceneEvent.class);
 
     }
 
@@ -87,6 +93,11 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
     }
 
     @Override
+    public void subscribeRemoveSceneEvent(SystemEventListener<RemoveSceneEvent> listener) {
+        removeSceneEventResult.addLookupListener(new ProxyLookupListener<RemoveSceneEvent>(listener));
+    }
+
+    @Override
     public void selectScript(ScriptSelectedEvent scriptSelectedEvent) {
         secletScriptContent.set(Lists.newArrayList(scriptSelectedEvent), null);
     }
@@ -100,6 +111,12 @@ public class SystemEventServiceImpl implements EventSystemService.ProducerServic
     @Override
     public void removeCharacterEvent(RemoveCharacterEvent removeCharacterEvent) {
         removeCharacterContent.set(Lists.newArrayList(removeCharacterEvent), null);
+    }
+
+    @Override
+    public void removeSceneEvent(RemoveSceneEvent removeSceneEvent) {
+        removeSceneContent.set(Lists.newArrayList(removeSceneEvent), null);
+
     }
 
     private static class ProxyLookupListener<T extends AbstractEvent> implements LookupListener {
