@@ -12,10 +12,7 @@
     <packaging>nbm-application</packaging>
 
     <name>ide-app</name>
-
-
-
-
+         <!--asfdasfdasfd-->
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide/>
