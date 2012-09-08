@@ -13,6 +13,9 @@
 
     <name>ide-app</name>
 
+
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <netbeans.run.params.ide/>
